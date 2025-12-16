@@ -1,4 +1,4 @@
-package com.E_Commerce.ProductService.Entities;
+package com.E_Commerce.productservice.entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 public class Product {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
-  private String id; // UUID recommended
+  private String id;
   private String name;
   private String description;
   private BigDecimal price;
