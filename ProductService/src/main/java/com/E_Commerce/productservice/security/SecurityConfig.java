@@ -12,7 +12,7 @@ public class SecurityConfig {
 
   @Bean
   @Profile("local")
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) {
     http
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers("/**").permitAll()
