@@ -1,5 +1,6 @@
 package com.E_Commerce.productservice.controller;
 
+import com.E_Commerce.productservice.exception.ResourceNotFoundException;
 import com.E_Commerce.productservice.requests.ProductRequest;
 import com.E_Commerce.productservice.responses.ProductResponse;
 import com.E_Commerce.productservice.service.ProductService;
@@ -9,12 +10,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean; // Correct import for newer Spring Boot
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
-import java.util.Optional;
+import java.util.Objects;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -55,6 +56,7 @@ class ProductControllerTest {
     }
 
     @Test
+    @SuppressWarnings("null")
     void createProduct_Success() throws Exception {
         when(productService.createProduct(any(ProductRequest.class))).thenReturn(productResponse);
 
@@ -72,14 +74,14 @@ class ProductControllerTest {
         productRequest.setPrice(BigDecimal.valueOf(-1)); // Invalid: Negative
 
         mockMvc.perform(post("/v1/products/create")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(productRequest)))
+                .contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
+                .content(Objects.requireNonNull(objectMapper.writeValueAsString(productRequest))))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void getProductById_Success() throws Exception {
-        when(productService.getProductById("123")).thenReturn(Optional.of(productResponse));
+        when(productService.getProductById("123")).thenReturn(productResponse);
 
         mockMvc.perform(get("/v1/products/getProductById")
                 .param("productId", "123"))
@@ -89,18 +91,19 @@ class ProductControllerTest {
 
     @Test
     void getProductById_NotFound() throws Exception {
-        when(productService.getProductById("999")).thenReturn(Optional.empty());
+        when(productService.getProductById("999")).thenThrow(new ResourceNotFoundException("Product", "id", "999"));
 
         mockMvc.perform(get("/v1/products/getProductById")
                 .param("productId", "999"))
-                .andExpect(status().isOk()) // Controller returns Optional.empty which is null body or 200 with null
-                .andExpect(content().string("null"));
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Product not found with id : '999'"));
     }
 
     @Test
+    @SuppressWarnings("null")
     void updateProduct_Success() throws Exception {
         when(productService.updateProduct(eq("123"), any(ProductRequest.class)))
-                .thenReturn(Optional.of(productResponse));
+                .thenReturn(productResponse);
 
         mockMvc.perform(put("/v1/products/update/{productId}", "123")
                 .contentType(MediaType.APPLICATION_JSON)

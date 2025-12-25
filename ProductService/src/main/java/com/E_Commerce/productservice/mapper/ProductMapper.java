@@ -10,6 +10,8 @@ import org.mapstruct.Mapping;
 public interface ProductMapper {
     @Mapping(target = "category", ignore = true)
     @Mapping(target = "productId", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     Product toEntity(ProductRequest request);
 
     @Mapping(source = "category.categoryName", target = "categoryName")

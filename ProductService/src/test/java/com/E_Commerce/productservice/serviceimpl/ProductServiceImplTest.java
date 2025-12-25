@@ -6,6 +6,7 @@ import com.E_Commerce.productservice.mapper.ProductMapper;
 import com.E_Commerce.productservice.repositories.CategoryRepository;
 import com.E_Commerce.productservice.repositories.ProductRepository;
 import com.E_Commerce.productservice.requests.ProductRequest;
+import com.E_Commerce.productservice.exception.ResourceNotFoundException;
 import com.E_Commerce.productservice.responses.ProductResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,6 +71,7 @@ class ProductServiceImplTest {
     }
 
     @Test
+    @SuppressWarnings("null")
     void createProduct_Success() {
         when(productMapper.toEntity(any(ProductRequest.class))).thenReturn(product);
         when(categoryRepository.findByCategoryName(anyString())).thenReturn(Optional.of(category));
@@ -85,11 +87,12 @@ class ProductServiceImplTest {
     }
 
     @Test
+    @SuppressWarnings("null")
     void createProduct_NewCategory_Success() {
         when(productMapper.toEntity(any(ProductRequest.class))).thenReturn(product);
         when(categoryRepository.findByCategoryName(anyString())).thenReturn(Optional.empty());
         when(categoryRepository.save(any(Category.class))).thenReturn(category);
-        when(productRepository.save(any(Product.class))).thenReturn(product);
+        when(productRepository.save((Product) any(Product.class))).thenReturn(product);
         when(productMapper.toResponse(any(Product.class))).thenReturn(productResponse);
 
         ProductResponse response = productService.createProduct(productRequest);
@@ -104,42 +107,41 @@ class ProductServiceImplTest {
         when(productRepository.findById("123")).thenReturn(Optional.of(product));
         when(productMapper.toResponse(product)).thenReturn(productResponse);
 
-        Optional<ProductResponse> result = productService.getProductById("123");
+        ProductResponse result = productService.getProductById("123");
 
-        assertTrue(result.isPresent());
-        assertEquals("Laptop", result.get().getName());
+        assertNotNull(result);
+        assertEquals("Laptop", result.getName());
     }
 
     @Test
     void getProductById_NotFound() {
         when(productRepository.findById("999")).thenReturn(Optional.empty());
 
-        Optional<ProductResponse> result = productService.getProductById("999");
-
-        assertFalse(result.isPresent());
+        assertThrows(ResourceNotFoundException.class, () -> productService.getProductById("999"));
     }
 
     @Test
+    @SuppressWarnings("null")
     void updateProduct_Success() {
         when(productRepository.findById("123")).thenReturn(Optional.of(product));
         when(categoryRepository.findByCategoryName(anyString())).thenReturn(Optional.of(category));
         when(productRepository.save(any(Product.class))).thenReturn(product);
         when(productMapper.toResponse(any(Product.class))).thenReturn(productResponse);
 
-        Optional<ProductResponse> result = productService.updateProduct("123", productRequest);
+        ProductResponse result = productService.updateProduct("123", productRequest);
 
-        assertTrue(result.isPresent());
-        assertEquals("Laptop", result.get().getName());
+        assertNotNull(result);
+        assertEquals("Laptop", result.getName());
         verify(productRepository, times(1)).save(product);
     }
 
     @Test
+    @SuppressWarnings("null")
     void updateProduct_NotFound() {
         when(productRepository.findById("999")).thenReturn(Optional.empty());
 
-        Optional<ProductResponse> result = productService.updateProduct("999", productRequest);
+        assertThrows(ResourceNotFoundException.class, () -> productService.updateProduct("999", productRequest));
 
-        assertFalse(result.isPresent());
         verify(productRepository, never()).save(any(Product.class));
     }
 
@@ -153,6 +155,7 @@ class ProductServiceImplTest {
     }
 
     @Test
+    @SuppressWarnings("null")
     void getAllProducts_Success() {
         Page<Product> productPage = new PageImpl<>(Collections.singletonList(product));
         when(productRepository.findAll(any(PageRequest.class))).thenReturn(productPage);
