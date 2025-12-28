@@ -14,10 +14,10 @@ public class SecurityConfig {
   @Profile("local")
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
+        .csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers("/**").permitAll()
-            .anyRequest().authenticated()
-        )
+            .anyRequest().authenticated())
         .formLogin(Customizer.withDefaults());
 
     return http.build();
