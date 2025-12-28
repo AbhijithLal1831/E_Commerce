@@ -1,0 +1,25 @@
+# Maven
+**/target/
+*.log
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+.factorypath
+.apt_generated
+
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Wrapper
+.mvn/wrapper/maven-wrapper.jar
