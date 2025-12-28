@@ -46,7 +46,8 @@ public class CategoryServiceImpl implements CategoryService {
         log.info("Creating category: {}", categoryRequest.getCategoryName());
         categoryRepository.findByCategoryName(categoryRequest.getCategoryName()).ifPresent(existing -> {
             log.error("Category already exists with name: {}", existing.getCategoryName());
-            throw new ResourceAlreadyExistsException("Category", "categoryName", existing.getCategoryName());
+            throw new ResourceAlreadyExistsException("Category", "categoryName", existing.getCategoryName(),
+                    existing.getCategoryId());
         });
 
         Category category = categoryMapper.toEntity(categoryRequest);
